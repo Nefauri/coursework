@@ -1,0 +1,120 @@
+<html>
+<!--Note: open in Mozilla Firefox if you don't see anything -->
+	<head>
+		<title>Tasty Scene</title>
+	</head>
+
+	<body>
+
+		<!-- load external files containing Javascript code -->
+		<script src="Three.js"></script>
+		<script src="OrbitControls.js"></script>
+
+		<script>
+
+			var scene, camera, renderer;
+			var geometry, material, mesh;
+			var coneGeometry, coneMaterial, coneMesh;
+			var creamGeometry, creamMaterial, creamMesh;
+			var donutGeometry, donutMaterial, donutMesh;
+			var d2Geo, d2Mat, d2Mesh;
+
+			initialize();
+			loop();
+
+			function initialize() 
+			{
+				// create a canvas, get WebGL context
+				renderer = new THREE.WebGLRenderer({antialias:true});
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				// attach canvas object ("domElement") to HTML document
+				document.body.appendChild( renderer.domElement );
+				
+				// scene is a container for all objects in 3D world
+				scene = new THREE.Scene();
+
+				// add the camera
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 10000 );
+				camera.position.set(0,2,10);
+
+				// adds event listener for mouse events
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				
+				// add the lights
+				var light = new THREE.PointLight(0xFFFFFF);
+				light.position.set(100,250,100);
+				scene.add(light);
+				var ambientLight = new THREE.AmbientLight(0x444444);
+				scene.add(ambientLight);
+				
+				// initialize geometric data
+
+				 creamGeometry = new THREE.SphereGeometry( 1, 32, 16, 0, 2*Math.PI, 0, Math.PI/2 );				
+
+				donutGeometry = new THREE.TorusGeometry( 1, 0.57, 16, 40 );
+				d2Geo = new THREE.TorusGeometry( 1, 0.57, 16, 40 );
+
+				 coneGeometry = new THREE.CylinderGeometry( 1, 0, 2, 20, 4 );
+				
+				// material setup
+				var loader = new THREE.TextureLoader();
+				
+				var d2Tex = loader.load("donut - Copy.png");
+				d2Mat = new THREE.MeshPhongMaterial( {map: d2Tex} );
+				d2Mesh = new THREE.Mesh(d2Geo, d2Mat);
+				d2Mesh.position.set (-3, 3, 0);
+				d2Mesh.rotateX(Math.PI / 4);
+				d2Mesh.rotateY(Math.PI / 4);
+				scene.add(d2Mesh);
+
+				
+				var donutTex = loader.load("donut.png");
+				donutMaterial = new THREE.MeshPhongMaterial( {map: donutTex} );
+				donutMesh = new THREE.Mesh(donutGeometry, donutMaterial);
+				donutMesh.position.set (5, .6, 0);
+				donutMesh.rotateX(Math.PI / 2);
+				scene.add(donutMesh);
+				
+				var creamTex = loader.load("cream.jpg");
+				creamMaterial = new THREE.MeshBasicMaterial( {map: creamTex} );
+				creamMesh = new THREE.Mesh(creamGeometry, creamMaterial);
+				creamMesh.position.set(0,2,0);
+				scene.add(creamMesh);
+				
+				var coneTex = loader.load( "cone.png" );
+				coneMaterial = new THREE.MeshBasicMaterial( { map: coneTex } );
+				coneMesh = new THREE.Mesh( coneGeometry, coneMaterial );
+				   
+				coneMesh.position.set(0, 1, 0);
+				scene.add( coneMesh );
+
+				var floorGeometry = new THREE.BoxGeometry( 100, 0.01, 100 );
+				var floorTexture = loader.load( "mcd.jpg" );
+				floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
+				floorTexture.repeat.set( 10, 10 );
+				var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture } );
+				var floorMesh = new THREE.Mesh( floorGeometry, floorMaterial );
+				floorMesh.position.set(0, -0.01, 0);
+				scene.add( floorMesh ); 
+			}
+
+			function loop() 
+			{
+				update();
+				render();
+				requestAnimationFrame( loop );
+			}
+
+			function update()
+			{
+				// mesh.rotation.y += 0.02;
+			}
+
+			function render()
+			{
+				renderer.render( scene, camera );
+			}
+
+		</script>
+	</body>
+</html>

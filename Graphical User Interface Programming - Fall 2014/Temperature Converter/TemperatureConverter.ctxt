@@ -1,0 +1,11 @@
+#BlueJ class context
+comment0.params=args
+comment0.target=void\ main(java.lang.String[])
+comment0.text=\r\n\ \ \ Runs\ the\ application.\r\n\ \ \ Note\:\ Application\ is\ a\ Process,\ only\ one\ allowed\ per\ VM.\r\n
+comment1.params=theStage
+comment1.target=void\ start(javafx.stage.Stage)
+comment2.params=o\ oldValue\ newValue
+comment2.target=void\ changed(javafx.beans.value.ObservableValue,\ java.lang.Object,\ java.lang.Object)
+comment3.params=
+comment3.target=double\ computeValue()
+numComments=4

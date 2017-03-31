@@ -1,0 +1,1 @@
+Parse summarizes the latest three entries on a Blogspot blog.

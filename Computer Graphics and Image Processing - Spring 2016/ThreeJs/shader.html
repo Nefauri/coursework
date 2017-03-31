@@ -1,0 +1,180 @@
+<html>
+<!--Note: open in Mozilla Firefox if you don't see anything -->
+<head>
+<title>Water Shader</title>
+</head>
+
+<body>
+
+<!-- load external files containing Javascript code -->
+<script src="Three.js"></script>
+<script src="OrbitControls.js"></script>
+
+<script id="vertexShader" type="x-shader/x-vertex">
+// predefined variables by WebGL
+// attribute vec3 position;
+// attribute mat4 projectionMatrix;
+// attribute mat4 modelViewMatrix;
+// attribute vec2 uv; 
+varying vec2 textureCoordinates;
+uniform float time;
+uniform sampler2D noiseTexture;
+
+void main()
+{
+   textureCoordinates = uv;
+   
+   //vec3 newposition = vec3( position.x, position.y, sin(time) );
+
+   vec2 newtexcoords = textureCoordinates + vec2(sin(time), sin(time));
+   vec2 fixtexcoords = mod( newtexcoords, 1.0 );
+   
+   vec4 noiseColor = texture2D( noiseTexture, fixtexcoords );
+   vec3 newposition = vec3( position.x, position.y, noiseColor.r );
+
+   
+  gl_Position = projectionMatrix * modelViewMatrix * vec4( newposition, 1.0 );
+}
+</script>
+
+<script id="fragmentShader" type="x-shader/x-vertex">
+uniform sampler2D baseTexture;
+uniform sampler2D noiseTexture;
+uniform float time;
+varying vec2 textureCoordinates;
+void main()
+{
+    vec4 noiseColor = texture2D( noiseTexture, textureCoordinates );
+	vec2 noiseCoordinates = textureCoordinates + vec2( noiseColor.r, noiseColor.g )+ vec2(sin(1.0/time),sin(0.5/time)*cos(time));
+	vec2 fixedCoordinates = mod( noiseCoordinates, 1.0 );
+    // extract RGBA data from image
+	vec4 baseColor = texture2D( baseTexture, fixedCoordinates );
+	gl_FragColor = baseColor;
+}
+</script>
+
+<script>
+
+var scene, camera, renderer;
+var pool, material, mesh;
+var jsTime;
+var customUniforms;
+var torus, torusMat, torusMesh, torusMesh2;
+
+initialize();
+loop();
+
+function initialize() 
+{
+	jsTime = 0;
+	
+	// create a canvas, get WebGL context
+    renderer = new THREE.WebGLRenderer({antialias:true});
+    renderer.setSize( window.innerWidth, window.innerHeight );
+	// attach canvas object ("domElement") to HTML document
+    document.body.appendChild( renderer.domElement );
+	
+	// scene is a container for all objects in 3D world
+    scene = new THREE.Scene();
+
+	// add the camera
+    camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 10000 );
+    camera.position.set(0,2,10);
+
+	// adds event listener for mouse events
+	controls = new THREE.OrbitControls( camera, renderer.domElement );
+	
+	// add the lights
+	var light = new THREE.PointLight(0xFFFFFF);
+	light.position.set(100,250,100);
+	scene.add(light);
+	var ambientLight = new THREE.AmbientLight(0x444444);
+	scene.add(ambientLight);
+	
+	// initialize geometric data
+	
+	torus = new THREE.TorusGeometry( 1, 0.25, 16, 40 );
+	
+    pool = new THREE.PlaneGeometry( 10,10, 100,100 );
+
+	var loader = new THREE.TextureLoader();
+	var texture = loader.load( "water.jpg" );
+	var texture2 = loader.load( "render.png" );
+	
+	// material = new THREE.MeshBasicMaterial( { map: texture, side: THREE.DoubleSide } );
+	
+	// create our own custom material
+	
+	// Step 1: load uniforms
+	customUniforms = {
+		baseTexture  : { type: "t", value: texture },
+		noiseTexture : { type: "t", value: texture2 },
+		time : {type: "f", value: jsTime }
+	};
+	
+	// Step 2: create material from uniforms & shader code.
+	var customMaterial = new THREE.ShaderMaterial(
+	{
+		      uniforms: customUniforms,
+		  vertexShader: document.getElementById("vertexShader").textContent,
+		fragmentShader: document.getElementById("fragmentShader").textContent,
+		          side: THREE.DoubleSide
+	});
+	
+	torusMat = new THREE.MeshPhongMaterial( { color: 0x0000FF } );
+	torusMesh = new THREE.Mesh(torus, torusMat);
+	torusMesh2 = new THREE.Mesh(torus, torusMat);
+
+
+	
+    mesh = new THREE.Mesh( pool, customMaterial );
+	mesh.position.set(0, 1, 0);
+	torusMesh2.position.set(0, 0.9, 0);
+	torusMesh.position.set(0,.2,0);
+	mesh.rotateX(Math.PI / 2);
+	torusMesh.rotateX(Math.PI / 2);
+	torusMesh2.rotateX(Math.PI / 2);
+
+	torusMesh.scale.set(6,6,6);
+	torusMesh2.scale.set(6,6,6);
+    scene.add( mesh );
+	scene.add(torusMesh);
+	scene.add(torusMesh2);
+	
+    var floorGeometry = new THREE.BoxGeometry( 100, 0.01, 100 );
+	var floorTexture = loader.load( "grass.jpg" );
+	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
+	floorTexture.repeat.set( 10, 10 );
+	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture } );
+	var floorMesh = new THREE.Mesh( floorGeometry, floorMaterial );
+	floorMesh.position.set(0, -0.01, 0);
+    scene.add( floorMesh ); 
+			var skyGeometry = new THREE.SphereGeometry( 5000, 32, 32 );
+			var skyTexture  = loader.load("sky.jpg");
+			var skyMaterial = new THREE.MeshBasicMaterial( { map: skyTexture, side: THREE.BackSide } );
+			var skyMesh = new THREE.Mesh( skyGeometry, skyMaterial );
+			scene.add(skyMesh);
+}
+
+function loop() 
+{
+	update();
+	render();
+    requestAnimationFrame( loop );
+}
+
+function update()
+{
+
+	jsTime += 0.016;
+	customUniforms.time.value = jsTime;
+}
+
+function render()
+{
+	renderer.render( scene, camera );
+}
+
+</script>
+</body>
+</html>

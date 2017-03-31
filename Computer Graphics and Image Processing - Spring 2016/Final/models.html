@@ -1,0 +1,160 @@
+<html>
+
+<head>
+<title>Importing 3D Models</title>
+</head>
+
+<body>
+
+<!-- load external files containing Javascript code -->
+<script src="Three.js"></script>
+<script src="OrbitControls.js"></script>
+
+<script>
+
+var scene, camera, renderer;
+var geometry, material, mesh;
+var bookGeo, bookMat;
+var sofaGeo, sofaMat;
+var vaseGeo, vaseMat;
+
+initialize();
+loop();
+
+function initialize() 
+{
+	// create a canvas, get WebGL context
+    renderer = new THREE.WebGLRenderer({antialias:true});
+    renderer.setSize( window.innerWidth, window.innerHeight );
+	// attach canvas object ("domElement") to HTML document
+    document.body.appendChild( renderer.domElement );
+	
+	// scene is a container for all objects in 3D world
+    scene = new THREE.Scene();
+
+	// add the camera
+    camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 10000 );
+    camera.position.set(0,2,10);
+
+	// adds event listener for mouse events
+	controls = new THREE.OrbitControls( camera, renderer.domElement );
+	
+	// add the lights
+	var light = new THREE.PointLight(0xFFFFFF);
+	light.position.set(100,250,100);
+	scene.add(light);
+	var ambientLight = new THREE.AmbientLight(0x444444);
+	scene.add(ambientLight);
+	
+	
+	var loader = new THREE.TextureLoader();
+
+    var floorGeometry = new THREE.BoxGeometry( 100, 0.01, 100 );
+	var floorTexture = loader.load( "carpet1.jpg" );
+	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
+	floorTexture.repeat.set( 100, 100 );
+	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture } );
+	var floorMesh = new THREE.Mesh( floorGeometry, floorMaterial );
+	floorMesh.position.set(0, -0.01, 0);
+    scene.add( floorMesh );
+	
+	// NEW CODE FOR LOADING MODELS.
+	 loader = new THREE.JSONLoader();
+	
+	loader.load('vase.json', function (vaseGeo, vaseMat)
+	{
+		var vmat = new THREE.MeshLambertMaterial({
+		map: THREE.ImageUtils.loadTexture('water.jpg'),
+		colorAmbient: [0.0, 0.3, 0.5],
+		colorDiffuse: [0.9, 0.9, 0.9],
+		colorSpecular: [0.9,0.9,0.9],
+		//transparent: true,
+		side: THREE.DoubleSide,
+		shading: THREE.SmoothShading
+		});
+		var vaseMesh = new THREE.Mesh(vaseGeo, vmat);
+		vaseMesh.rotation.x = 3.14/2;
+		//vaseMesh.rotation.z = 3.14/2;
+		vaseMesh.position.set(0,3.42,0);
+		vaseMesh.scale.set(0.2, 0.2, 0.2);
+		scene.add(vaseMesh);
+	});
+	
+	loader.load('sofa.json', function (sofaGeo, sofaMat)
+	{
+		var smat = new THREE.MeshLambertMaterial({
+		map: THREE.ImageUtils.loadTexture('up8.jpg'),
+		colorAmbient: [0.5, 0.5, 0.5],
+		colorDiffuse: [0.9, 0.9, 0.9],
+		colorSpecular: [0.3,0.3,0.3],
+		side: THREE.DoubleSide,
+		shading: THREE.SmoothShading
+		});
+		var sofaMesh = new THREE.Mesh(sofaGeo, smat);
+		sofaMesh.rotation.x = 3.14/2;
+		sofaMesh.rotation.z = 3.14/2;
+		sofaMesh.position.set(0,1,-12);
+		//sofaMesh.scale.set(0.2, 0.2, 0.2);
+		scene.add(sofaMesh);
+	});
+	loader.load('book.json', function (bookGeo, bookMat)
+	{
+		var bmat = new THREE.MeshLambertMaterial({
+		map: THREE.ImageUtils.loadTexture('parchment.jpg'),
+		colorAmbient: [0.5, 0.5, 0.5],
+		colorDiffuse: [0.9, 0.9, 0.9],
+		colorSpecular: [0.3,0.3,0.3],
+		side: THREE.DoubleSide,
+		shading: THREE.SmoothShading
+		});
+		var bookMesh = new THREE.Mesh(bookGeo, bmat);
+		bookMesh.rotation.z = 3.14/2;
+		bookMesh.rotation.y = -(3.14/8);
+		bookMesh.position.set(2,3.5,2.3);
+		bookMesh.scale.set(0.2, 0.2, 0.2);
+		scene.add(bookMesh);
+	});
+	
+    loader.load('table2.json', function (geometry2, materials2) 
+	{
+	
+	
+      var material2 = new THREE.MeshLambertMaterial({
+        map: THREE.ImageUtils.loadTexture('wicker.jpg'),   
+        colorAmbient: [0.5, 0.5, 0.5],
+        colorDiffuse: [0.9, 0.9, 0.9],
+        colorSpecular: [0.3, 0.3, 0.3],
+		side: THREE.DoubleSide,
+		shading: THREE.SmoothShading
+      });
+   
+	  var mesh2 = new THREE.Mesh( geometry2, material2 );
+	  mesh2.rotation.x = 3.14/2;
+	  mesh2.position.set(0,1.5,0);
+	  mesh2.scale.set(11,11,11);
+      scene.add( mesh2 );
+    });
+	
+	
+}
+
+function loop() 
+{
+	update();
+	render();
+    requestAnimationFrame( loop );
+}
+
+function update()
+{
+	
+}
+
+function render()
+{
+	renderer.render( scene, camera );
+}
+
+</script>
+</body>
+</html>

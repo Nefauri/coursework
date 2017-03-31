@@ -1,0 +1,52 @@
+<html>
+	<head>
+		<title>Hello WebGL</title>
+	</head>
+
+	<body onload="main()"> 
+		<canvas id = "myCanvas"> </canvas>
+
+		<script id="vertex-shader" type="x-shader">
+			void main()
+			{
+				//these variables are defined by OpenGL
+				//Create Vector4
+				gl_Position = vec4(0.0,0.0,0.0,1.0);
+				//How many pixels each point takes up
+				gl_PointSize = 70.0;
+			}
+		</script>
+
+		<script id="fragment-shader" type="x-shader">
+			void main()
+			{
+				//Assign single color to all pixels
+				gl_FragColor = vec4(0.0,0.4,0.6,1.0); //rgba
+			}
+		</script>
+
+		<script src = "webgl-utils.js"></script>
+
+		<script>
+			function main()
+			{
+				//access the canvas tag
+				var theCanvas = document.getElementById("myCanvas");
+				//sets up context using helper function
+				var gl = setupWebGL(theCanvas);
+				//compile shader programs
+				var program = initShaders(gl, "vertex-shader", "fragment-shader");
+				//send programs to GPU context
+				gl.useProgram(program);
+				//Background / clear color 
+				gl.clearColor(0.0,0.0,0.0,1.0); //RGBA
+				//Clear canvas 
+				gl.clear(gl.COLOR_BUFFER_BIT);
+				//draw the point defined in the shader programs
+				//param: DATA TYPE, OFFSET FOR FIRST ELEMENT, NUMBER OF DATA POINTS
+				gl.drawArrays(gl.POINTS, 0, 1);
+			}
+		</script>
+		
+	</body>
+</html>

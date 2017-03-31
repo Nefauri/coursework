@@ -1,0 +1,170 @@
+<html>
+<!--Note: open in Mozilla Firefox if you don't see anything -->
+	<head>
+		<title>Helium</title>
+	</head>
+
+	<body>
+
+		<!-- load external files containing Javascript code -->
+		<script src="Three.js"></script>
+		<script src="OrbitControls.js"></script>
+
+		<script>
+
+		var scene, camera, renderer;
+		var nucleusGeo, nucleusMat, nucleusMesh;
+		var neutronGeo, neutronMat, neutron1Mesh, neutron2Mesh;
+		var protonGeo, protonMat, proton1Mesh, proton2Mesh;
+		var electronGeo, electronMat, electron1Mesh, electron2Mesh;
+
+		var time, slow, fast;
+
+
+		initialize();
+		loop();
+
+		function initialize() 
+		{
+			// create a canvas, get WebGL context
+			renderer = new THREE.WebGLRenderer({antialias:true});
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			// attach canvas object ("domElement") to HTML document
+			document.body.appendChild( renderer.domElement );
+			
+			// scene is a container for all objects in 3D world
+			scene = new THREE.Scene();
+
+			// add the camera
+			camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 10000 );
+			camera.position.set(0,2,10);
+
+			// adds event listener for mouse events
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			
+			// add the lights
+			var light = new THREE.PointLight(0xFFFFFF);
+			light.position.set(100,250,100);
+			scene.add(light);
+			var ambientLight = new THREE.AmbientLight(0x444444);
+			scene.add(ambientLight);
+			
+			// initialize geometric data
+				
+
+			nucleusGeo = new THREE.SphereGeometry(.7,32,16);
+			neutronGeo = new THREE.SphereGeometry(.1, 32, 16);
+			protonGeo = new THREE.SphereGeometry(.17, 32, 16);
+			electronGeo = new THREE.SphereGeometry(.05,32,16);
+			
+			// material setup
+			var loader = new THREE.TextureLoader();
+
+			 //use the following code for textured version
+			
+			nucleusMat = new THREE.MeshPhongMaterial({color: 0xFF0000, transparent: true, opacity: 0.75});
+			nucleusMesh = new THREE.Mesh(nucleusGeo, nucleusMat);
+	
+			neutronMat = new THREE.MeshPhongMaterial({color: 0x00FF00});
+			neutron1Mesh = new THREE.Mesh(neutronGeo, neutronMat);
+			neutron1Mesh.position.set(.1,0,0);
+			scene.add(neutron1Mesh);		
+			
+			neutron2Mesh = new THREE.Mesh(neutronGeo, neutronMat);
+			neutron2Mesh.position.set(-.1,0,0);
+			scene.add(neutron2Mesh);
+			
+			protonMat = new THREE.MeshPhongMaterial({color: 0x0000FF});
+			proton1Mesh = new THREE.Mesh(protonGeo, protonMat);
+			proton1Mesh.position.set(0,.2,0);
+			scene.add(proton1Mesh);
+
+			proton2Mesh = new THREE.Mesh(protonGeo, protonMat);
+			proton2Mesh.position.set(0,-.2,0);
+			scene.add(proton2Mesh);
+
+			electronMat = new THREE.MeshPhongMaterial({color: 0xFFFF00});
+			electron1Mesh = new THREE.Mesh(electronGeo, electronMat);
+			electron1Mesh.position.set(1,1,0);
+			scene.add(electron1Mesh);
+			
+			electron2Mesh = new THREE.Mesh(electronGeo, electronMat);
+			electron2Mesh.position.set(-1,1,0);
+			scene.add(electron2Mesh);
+			
+			nucleusMesh.position.set(0,0,0);
+			scene.add(nucleusMesh);
+			
+			var skyGeometry = new THREE.SphereGeometry( 5000, 32, 32 );
+			var skyTexture  = loader.load("space.png");
+			var skyMaterial = new THREE.MeshBasicMaterial( { map: skyTexture, side: THREE.BackSide } );
+			var skyMesh = new THREE.Mesh( skyGeometry, skyMaterial );
+			scene.add(skyMesh);
+
+			time = 0;
+			slow = 0;
+			fast = 0;
+		}
+
+		function loop() 
+		{
+			update();
+			render();
+			requestAnimationFrame( loop );
+		}
+
+		function f(t)
+		{  return 2 * Math.cos(t);  }
+
+		function g(t)
+		{  return 2 * Math.sin(t);  }
+
+		function s(t)
+		{  return 1/2 * Math.sin(3*t) + 1.2;  }
+
+		function update()
+		{
+			fast += 1/20;
+			time += 1/60;
+			slow += 1/120;
+			
+			electron1Mesh.position.x = f(fast);
+			electron1Mesh.position.y = g(fast);
+			electron1Mesh.position.z = g(fast);
+			
+			electron2Mesh.position.x = -f(fast);
+			electron2Mesh.position.y = -g(fast);
+			electron2Mesh.position.z = -f(fast);
+			
+			var dx = f(time) - f(time - 1/60);
+			var dy = g(time) - g(time - 1/60);
+			
+			var angle = Math.atan2(dy,dx);
+
+			
+			nucleusMesh.scale.x = s(slow);
+			nucleusMesh.scale.y = s(slow);
+			nucleusMesh.scale.z = s(slow);
+			
+			proton1Mesh.position.x = f(fast)/12;
+			proton1Mesh.position.y = g(fast)/12;
+			proton1Mesh.position.z = g(fast)/12;
+			proton2Mesh.position.x = -f(fast)/12;
+			proton2Mesh.position.y = -g(fast)/12;
+			proton2Mesh.position.z = -g(fast)/12;
+
+			neutron1Mesh.position.x = f(fast)/6;
+			neutron1Mesh.position.z = g(fast)/6;
+			neutron2Mesh.position.x = -f(fast)/6;
+			neutron2Mesh.position.z = -g(fast)/6;
+			
+		}
+
+		function render()
+		{
+			renderer.render( scene, camera );
+		}
+
+	</script>
+	</body>
+</html>

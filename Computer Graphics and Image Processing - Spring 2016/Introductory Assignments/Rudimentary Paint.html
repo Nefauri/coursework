@@ -1,0 +1,138 @@
+<!--Victoria Iacono Henderson-->
+
+<html>
+	<head>
+	  <title>Rudimentary Paint</title>
+	</head>
+
+	<body onload="main()">
+
+		<canvas id="myCanvas" width="400" height="400"></canvas>
+
+		<!-- Load external file with helper setup functions. -->
+
+
+		<script src="webgl-utils.js"></script>
+
+		<!-- vertex shader code -->
+
+		<script id="vertex-shader" type="x-shader">
+		attribute vec4 pointPosition;
+		void main()
+		{
+		gl_Position = pointPosition;
+		gl_PointSize = 10.0;
+		}
+
+		</script>
+
+		<!-- fragment shader code -->
+
+		<script id="fragment-shader" type="x-shader">
+			void main()
+			{
+			gl_FragColor = vec4(0.0,0.4,0.6,1.0);
+			}
+
+			// WRITE FRAGMENT SHADER HERE
+
+		</script>
+
+		<!-- main Javascript program -->
+
+		<script>
+
+		// DECLARE GLOBAL JAVASCRIPT VARIABLES
+		var canvas = document.getElementById('myCanvas');
+		canvas.addEventListener("mousedown", getPosition, false);
+		var gl; // the WebGL context
+		var numPoints = 3;
+		var positionArray = new Float32Array(
+								[0.0,0.5, -0.5,-0.5, 0.5,-0.5] );
+
+		function main() 
+		{
+			// STANDARD STARTUP CODE
+			gl = setupWebGL(canvas);
+			var program = initShaders( gl, "vertex-shader", "fragment-shader" );
+			gl.useProgram( program );
+			
+			// WRITE MAIN JAVASCRIPT CODE HERE
+
+			
+			// create an array that stores (x,y) OpenGL coordinates
+			
+			//create buffer space in vertex shader
+			var positionBuffer = gl.createBuffer();
+			//bind type to the buffer
+			gl.bindBuffer( gl.ARRAY_BUFFER, positionBuffer);
+			//write data into the buffer object
+			gl.bufferData( gl.ARRAY_BUFFER, positionArray, gl.STATIC_DRAW);
+			//associate buffer data with attribute variable
+			//get address of attribute variable
+			var pointPositionAddress = gl.getAttribLocation(program, "pointPosition");
+			//make attribute variable "point" to the vertex buffer
+			
+			gl.vertexAttribPointer(	pointPositionAddress, 	//location of data
+									2,						//number of values provided per point
+									gl.FLOAT, 				//type of data being sent
+									false, 					//normalize vectors (no)
+									0,						//stride
+									0						//offset
+									);
+		//activate/confirm pointer assignment
+		gl.enableVertexAttribArray(pointPositionAddress);
+		//standard draw commands
+		gl.clearColor(0.0,0.0,0.0,1.0);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.drawArrays(gl.POINTS, 0, numPoints);	
+		}
+
+		function getPosition(event)
+		{
+		  var x = event.x;
+		  var y = event.y;
+
+		  var canvas = document.getElementById("myCanvas");
+
+		  x -= canvas.offsetLeft;
+		  y -= canvas.offsetTop;
+		 //CONVERT PIXELS TO OPENGL COORDINATES
+		  if (x < 200)
+		  {
+			x = -1*(1 - x/200);
+		  }
+		  else
+		  {
+			x = (x-200)/200;
+		  }
+		  if (y < 200)
+		  {
+			y = (200 - y)/200;
+		  }
+		  else
+		  {
+			y = (200 - y)/200;
+		  }
+
+		  numPoints++;
+		var newCoords = new Float32Array([x,y]);
+		  positionArray = Float32Concat(positionArray, newCoords);
+		  main();
+		}
+
+		function Float32Concat(first, second)
+		{
+			var firstLength = first.length,
+				result = new Float32Array(firstLength + second.length);
+
+			result.set(first);
+			result.set(second, firstLength);
+
+			return result;
+		}
+
+		</script>
+
+	</body>
+</html>

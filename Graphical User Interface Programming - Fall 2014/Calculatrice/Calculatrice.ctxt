@@ -1,0 +1,23 @@
+#BlueJ class context
+comment0.params=args
+comment0.target=void\ main(java.lang.String[])
+comment0.text=\r\n\ \ \ Run\ the\ application.\r\n\ \ \ Note\:\ Application\ is\ a\ Process,\ only\ one\ allowed\ per\ VM.\r\n
+comment1.params=theStage
+comment1.target=void\ start(javafx.stage.Stage)
+comment2.params=event
+comment2.target=void\ handle(javafx.event.ActionEvent)
+comment3.params=ae
+comment3.target=void\ handle(javafx.event.ActionEvent)
+comment4.params=ae
+comment4.target=void\ handle(javafx.event.ActionEvent)
+comment5.params=ae
+comment5.target=void\ handle(javafx.event.ActionEvent)
+comment6.params=ae
+comment6.target=void\ handle(javafx.event.ActionEvent)
+comment7.params=ae
+comment7.target=void\ handle(javafx.event.ActionEvent)
+comment8.params=labelText\ insertText\ disp
+comment8.target=javafx.scene.control.Button\ buttonMaker(java.lang.String,\ java.lang.String,\ Display)
+comment9.params=ae
+comment9.target=void\ handle(javafx.event.ActionEvent)
+numComments=10

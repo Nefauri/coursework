@@ -1,0 +1,109 @@
+<!--Victoria Iacono Henderson-->
+
+<html>
+	<head>
+		<title>Drawing with JavaScript </title>
+	</head>
+	
+	<body>
+		<!--canvas element-->
+		<canvas id="myCanvas" width=600 height=600> </canvas>
+		
+		<!--JavaScript -->
+		<script>
+			var canvas = document.getElementById("myCanvas");
+			var context = canvas.getContext("2d");
+			
+			//sky
+			var gradient = context.createLinearGradient(0,0,0,600);
+			gradient.addColorStop(0,"DarkSlateBlue");
+			gradient.addColorStop(0.5,"Navy");
+			gradient.addColorStop(0.7,"MidnightBlue");
+			context.fillStyle = gradient;
+			context.fillRect(0,0,600,600);
+			
+			//moon
+			var gradient1 = context.createRadialGradient(100,140,50,90,10,100);
+			gradient1.addColorStop(0,"white");
+			gradient1.addColorStop(0.9,"#ccffff");
+			
+			context.beginPath();
+			context.arc(100,140,50,0, 2*Math.PI);
+			context.fillStyle = gradient1;
+			context.fill();
+			
+			
+			
+			//grass
+			//context.fillStyle = "rgb(28,130,0)";
+			var gradient2 = context.createLinearGradient(0,500,0,600);
+			gradient2.addColorStop(0,"#001a00");
+			gradient2.addColorStop(0.5,"#003300");
+			context.fillStyle = gradient2;
+			context.fillRect(0,500,600,100)
+			
+			//window
+			context.lineWidth = 15;
+			context.strokeStyle = "rgb(255,232,207)";
+			context.strokeRect(7,7,300,300);
+			context.strokeRect(293,7,300,300);
+			context.strokeRect(7,293,300,300);
+			context.strokeRect(293,293,300,300);
+			
+			//curtains
+			context.fillStyle = "rgb(130,37,0)";
+			context.fillRect(0,0,600,100);
+			
+			
+			//curtain scallops
+			context.fillStyle = "rgba(130,37,0, 0.8)";
+			context.beginPath();
+				context.arc(0,90,40,0, Math.PI, false);
+			context.closePath();
+			context.fill();
+			context.beginPath();
+				context.arc(60,90,40,0, Math.PI, false);
+			context.closePath();
+			context.fill();		
+			context.beginPath();
+				context.arc(120,90,40,0, Math.PI, false);
+			context.closePath();
+			context.fill();
+			context.beginPath();
+				context.arc(180,90,40,0, Math.PI, false);
+			context.closePath();
+			context.fill();
+			context.beginPath();
+				context.arc(240,90,40,0, Math.PI, false);
+			context.closePath();
+			context.fill();
+			context.beginPath();
+				context.arc(300,90,40,0, Math.PI, false);
+			context.closePath();
+			context.fill();
+			context.beginPath();
+				context.arc(360,90,40,0, Math.PI, false);
+			context.closePath();
+			context.fill();
+			context.beginPath();
+				context.arc(420,90,40,0, Math.PI, false);
+			context.closePath();
+			context.fill();
+			context.beginPath();
+				context.arc(480,90,40,0, Math.PI, false);
+			context.closePath();
+			context.fill();
+			context.beginPath();
+				context.arc(540,90,40,0, Math.PI, false);
+			context.closePath();
+			context.fill();
+			context.beginPath();
+				context.arc(600,90,40,0, Math.PI, false);
+			context.closePath();
+			context.fill();
+		
+		</script>
+		
+	</body>
+
+</html>

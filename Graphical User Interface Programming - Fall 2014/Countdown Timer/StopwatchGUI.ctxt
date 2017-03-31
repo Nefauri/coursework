@@ -1,0 +1,15 @@
+#BlueJ class context
+comment0.params=args
+comment0.target=void\ main(java.lang.String[])
+comment0.text=\r\n\ \ \ Run\ the\ application.\r\n\ \ \ Note\:\ Application\ is\ a\ Process,\ only\ one\ allowed\ per\ VM.\r\n
+comment1.params=theStage
+comment1.target=void\ start(javafx.stage.Stage)
+comment2.params=ae
+comment2.target=void\ handle(javafx.event.ActionEvent)
+comment3.params=ae
+comment3.target=void\ handle(javafx.event.ActionEvent)
+comment4.params=ae
+comment4.target=void\ handle(javafx.event.ActionEvent)
+comment5.params=ae
+comment5.target=void\ handle(javafx.event.ActionEvent)
+numComments=6

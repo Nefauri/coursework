@@ -1,0 +1,298 @@
+<!--Victoria Iacono Henderson-->
+
+<html>
+	<head>
+		<title>WebGL Paint</title>
+	</head>
+
+	<body onload="main()">
+
+		<center>
+			<img id="red-bucket" src="red.png">
+			<img id="orange-bucket" src="orange.png">
+			<img id="yellow-bucket" src="yellow.png">
+			<img id="green-bucket" src="green.png">
+			<img id="blue-bucket" src="blue.png">
+			<img id="purple-bucket" src="purple.png">
+
+			<img id="big-brush" src="big.png">
+			<img id="med-brush" src="medium.png">
+			<img id="small-brush" src="small.png">
+
+			<br>
+
+			<canvas id="myCanvas" width="400" height="400"></canvas>
+		</center>
+
+
+
+		<!-- Load external file with helper setup functions. -->
+
+
+		<script src="webgl-utils.js"></script>
+
+		<!-- vertex shader code -->
+
+		<script id="vertex-shader" type="x-shader">
+			precision highp float;
+			attribute vec4 pointPosition;
+			attribute float size;
+			attribute vec4 color;
+			varying vec4 pointColor;
+			
+			void main()
+			{
+				gl_Position = pointPosition;
+				gl_PointSize = size;
+				pointColor = color;
+			}
+		</script>
+
+		<!-- fragment shader code -->
+
+		<script id="fragment-shader" type="x-shader">
+			precision highp float;
+			varying vec4 pointColor;
+
+			void main()
+			{
+				gl_FragColor = pointColor;
+			}
+
+		</script>
+
+		<!-- main Javascript program -->
+
+		<script>
+			//colors
+			var r = 1.0;
+			var g =1.0;
+			var b = 1.0;
+
+
+			// DECLARE GLOBAL JAVASCRIPT VARIABLES
+			var canvas = document.getElementById('myCanvas');
+			canvas.addEventListener("mousedown", getPosition, false);
+
+			canvas.addEventListener("mousemove", drawLine, false);
+
+			sz = 10.0;
+
+			var gl; // the WebGL context
+			var numPoints =0;
+			var positionArray = new Float32Array([]);
+
+			function main() 
+			{
+
+				counter = 0;
+
+
+				canvas.addEventListener("mousedown", mouseClick);
+
+				document.getElementById("red-bucket").addEventListener("mousedown", bucketClickR);
+				document.getElementById("orange-bucket").addEventListener("mousedown", bucketClickO);
+				document.getElementById("yellow-bucket").addEventListener("mousedown", bucketClickY);
+				document.getElementById("green-bucket").addEventListener("mousedown", bucketClickG);
+				document.getElementById("blue-bucket").addEventListener("mousedown", bucketClickB);
+				document.getElementById("purple-bucket").addEventListener("mousedown", bucketClickP);
+
+				document.getElementById("big-brush").addEventListener("mousedown",bigClick);
+				document.getElementById("med-brush").addEventListener("mousedown",medClick);
+				document.getElementById("small-brush").addEventListener("mousedown",smallClick);
+
+				// STANDARD STARTUP CODE
+				gl = setupWebGL(canvas);
+				var program = initShaders( gl, "vertex-shader", "fragment-shader" );
+				gl.useProgram( program );
+
+				//create buffer space in vertex shader
+				var positionBuffer = gl.createBuffer();
+				//bind type to the buffer
+				gl.bindBuffer( gl.ARRAY_BUFFER, positionBuffer);
+				//write data into the buffer object
+				gl.bufferData( gl.ARRAY_BUFFER, positionArray, gl.STATIC_DRAW);
+				//associate buffer data with attribute variable
+				//get address of attribute variable
+				var pointPositionAddress = gl.getAttribLocation(program, "pointPosition");
+				//make attribute variable "point" to the vertex buffer
+
+				var BPE = positionArray.BYTES_PER_ELEMENT;
+
+				gl.vertexAttribPointer(	pointPositionAddress, 	//location of data
+								2,						//number of values provided per point
+								gl.FLOAT, 				//type of data being sent
+								false, 					//normalize vectors (no)
+								6*BPE,						//stride
+								0						//offset
+								);
+				//activate/confirm pointer assignment
+				gl.enableVertexAttribArray(pointPositionAddress);
+				var pointColorAddress = gl.getAttribLocation(program, 'color')
+				gl.vertexAttribPointer(	pointColorAddress, 	//location of data
+								3,						//number of values provided per point
+								gl.FLOAT, 				//type of data being sent
+								false, 					//normalize vectors (no)
+								6*BPE,						//stride
+								3*BPE						//offset
+								);
+
+				var pointSizeAddress = gl.getAttribLocation(program, 'size');
+
+				gl.vertexAttribPointer(	pointSizeAddress, 	//location of data
+								1,						//number of values provided per point
+								gl.FLOAT, 				//type of data being sent
+								false, 					//normalize vectors (no)
+								6*BPE,						//stride
+								2*BPE						//offset
+								);
+
+				gl.enableVertexAttribArray( pointPositionAddress );
+				gl.enableVertexAttribArray( pointSizeAddress );
+				gl.enableVertexAttribArray(pointColorAddress);
+				//standard draw commands
+				gl.clearColor(0.0,0.0,0.0,1.0);
+				gl.clear(gl.COLOR_BUFFER_BIT);
+				gl.drawArrays(gl.POINTS, 0, numPoints);	
+			}
+
+			function drawLine(event)
+			{
+				if (event.buttons == 1)
+				getPosition(event);
+			}
+
+			function getPosition(event)
+			{
+				console.log(event);
+
+
+
+				var x = event.x;
+				var y = event.y;
+
+				var canvas = document.getElementById("myCanvas");
+
+				x -= canvas.offsetLeft;
+				y -= canvas.offsetTop;
+				//CONVERT PIXELS TO OPENGL COORDINATES
+				if (x < 200)
+				{
+					x = -1*(1 - x/200);
+				}
+				else
+				{
+					x = (x-200)/200;
+				}
+				if (y < 200)
+				{
+					y = (200 - y)/200;
+				}
+				else
+				{
+					y = (200 - y)/200;
+				}
+
+				numPoints++;
+				var newCoords = new Float32Array([x,y, sz, r, g, b]);
+				positionArray = Float32Concat(positionArray, newCoords);
+				main();
+			}
+
+			function Float32Concat(first, second)
+			{
+				var firstLength = first.length,
+				result = new Float32Array(firstLength + second.length);
+
+				result.set(first);
+				result.set(second, firstLength);
+
+				return result;
+			}
+
+			function bigClick(eventData)
+			{
+				alert("You clicked the big brush!");
+				sz = 20.0;
+
+			}
+
+			function medClick(eventData)
+			{
+				alert("You clicked the medium brush!");
+				sz = 10.0;
+
+			}
+
+			function smallClick(eventData)
+			{
+				alert("You clicked the small brush!");
+				sz = 5.0;
+
+			}
+
+			function bucketClickR(eventData)
+			{
+				alert("You clicked the red bucket!");
+				r = 1.0;
+				g = 0.0;
+				b = 0.0;
+			}
+
+			function bucketClickO(eventData)
+			{
+				alert("You clicked the orange bucket!");
+				r = 1.0;
+				g = 0.5;
+				b = 0.0;
+			}
+
+			function bucketClickY(eventData)
+			{
+				alert("You clicked the yellow bucket!");
+				r = 1.0;
+				g = 1.0;
+				b = 0.0;
+			}
+
+			function bucketClickG(eventData)
+			{
+				alert("You clicked the green bucket!");
+				r = 0.0;
+				g = 1.0;
+				b = 0.0;
+			}
+
+			function bucketClickB(eventData)
+			{
+				alert("You clicked the blue bucket!");
+				r = 0.0;
+				g = 0.0;
+				b = 1.0;
+			}
+
+			function bucketClickP(eventData)
+			{
+				alert("You clicked the purple bucket!");
+				r = 1.0;
+				g = 0.0;
+				b = 1.0;
+
+			}
+
+			var u_colorLocation = gl.getUniformLocation(program, "uniformColor");
+			gl.uniform4f(u_colorLocation, r, g, b, 1.0);
+			// eventData is automatically sent by JavaScript; it is an object that contains lots of data about whatever action just took place. mostly we care about the coordinates.
+			function mouseClick(eventData)
+			{
+				var canvasX = eventData.offsetX;
+				var canvasY = eventData.offsetY;
+				var webglX =      (canvasX - 200) / 200;
+				var webglY = -1 * (canvasY - 200) / 200;
+
+				counter++;
+			}
+	</script>
+	
+	</body>
+</html>
